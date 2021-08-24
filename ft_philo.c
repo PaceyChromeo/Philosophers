@@ -6,7 +6,7 @@
 /*   By: pjacob <pjacob@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/18 13:15:06 by pjacob            #+#    #+#             */
-/*   Updated: 2021/08/24 12:14:24 by pjacob           ###   ########.fr       */
+/*   Updated: 2021/08/24 12:49:32 by pjacob           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ static void	*philo_life(void *philos)
 	while (philo_lives(philo))
 	{
 		taking_fork(philo);
-		if (!eating(philo))
+		if (eating(philo) == 0)
 			return (NULL);
 		sleeping(philo);
 		thinking(philo);
@@ -31,7 +31,6 @@ static void	*philo_life(void *philos)
 static void	lch_thd(t_philos *philos, t_param *p, pthread_t *thread, int i)
 {
 	pthread_mutex_init(&p->fork[i], NULL);
-	pthread_mutex_unlock(&p->fork[i]);
 	philos[i].philo_id = i;
 	philos[i].right_fork = i + 1;
 	if (i == 0)
@@ -53,12 +52,15 @@ static void	lch_join_dest(t_philos *philos, t_param *p, pthread_t *thread)
 
 	i = -1;
 	while (++i < p->nb_philo)
+	{
 		lch_thd(philos, p, &thread[i], i);
+		usleep(1000);
+	}
 	i = -1;
 	while (++i < p->nb_philo)
 	{
 		pthread_join(thread[i], NULL);
-		printf("philo[%d]->max_eat : %d\n", philos[i].philo_id + 1, philos[i].nb_eat);
+		printf(WHITE"philo[%d]->max_eat : %d\n", philos[i].philo_id + 1, philos[i].nb_eat);
 		if (philos[i].nb_eat == 0)
 			pthread_detach(thread[i]);
 	}
@@ -100,7 +102,7 @@ int	main(int ac, char **av)
 		if (ac == 6)
 			param.max_eat = ft_atoi(av[5]);
 		else
-			param.max_eat = 0;
+			param.max_eat = -1;
 		create_thread(&param);
 	}
 	return (0);

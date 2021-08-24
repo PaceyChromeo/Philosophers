@@ -6,7 +6,7 @@
 /*   By: pjacob <pjacob@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/23 11:34:05 by pjacob            #+#    #+#             */
-/*   Updated: 2021/08/24 12:19:24 by pjacob           ###   ########.fr       */
+/*   Updated: 2021/08/24 12:46:47 by pjacob           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,10 +19,10 @@ void	taking_fork(t_philos *philo)
 	time = my_gettime();
 	pthread_mutex_lock(&philo->philo_p->fork[philo->left_fork]);
 	philo->lf_status = 1;
-	printf(GREEN"%d %d has taken a fork\n", time, philo->philo_id + 1);
+	printf(GREEN"%d %d has taken a fork %d\n", time, philo->philo_id + 1, philo->left_fork);
 	pthread_mutex_lock(&philo->philo_p->fork[philo->right_fork]);
 	philo->rf_status = 1;
-	printf(GREEN"%d %d has taken a fork\n", time, philo->philo_id + 1);
+	printf(GREEN"%d %d has taken a fork %d\n", time, philo->philo_id + 1, philo->right_fork);
 }
 
 int	eating(t_philos *philo)
@@ -30,7 +30,7 @@ int	eating(t_philos *philo)
 	int	time;
 
 	time = my_gettime();
-	if (philo->lf_status == 1 && philo->rf_status == 1)
+	if (philo->lf_status && philo->rf_status)
 	{
 		printf(RED"%d %d is eating\n", time, philo->philo_id + 1);
 		if (philo->philo_p->max_eat > 0)
