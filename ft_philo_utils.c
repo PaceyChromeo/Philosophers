@@ -6,9 +6,11 @@
 /*   By: pjacob <pjacob@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/05 10:40:32 by pjacob            #+#    #+#             */
-/*   Updated: 2021/08/24 10:05:13 by pjacob           ###   ########.fr       */
+/*   Updated: 2021/08/25 15:28:50 by pjacob           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+#include "ft_philo.h"
 
 int	ft_atoi(const char *nptr)
 {
@@ -34,4 +36,17 @@ int	ft_atoi(const char *nptr)
 		i++;
 	}
 	return (nb * neg);
+}
+
+int	free_stuffs(t_philos *philos, t_param *p, pthread_t *thread)
+{
+	int	i;
+
+	i = -1;
+	while (++i < p->nb_philo)
+		pthread_mutex_destroy(&p->fork[i]);
+	free(p->fork);
+	free(philos);
+	free(thread);
+	return (0);
 }

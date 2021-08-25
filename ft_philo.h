@@ -6,7 +6,7 @@
 /*   By: pjacob <pjacob@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/18 13:08:00 by pjacob            #+#    #+#             */
-/*   Updated: 2021/08/24 12:13:29 by pjacob           ###   ########.fr       */
+/*   Updated: 2021/08/25 15:54:35 by pjacob           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,22 +45,19 @@ typedef struct s_philosophers
 	int				philo_id;
 	int				left_fork;
 	int				right_fork;
-	int				lf_status;
-	int				rf_status;
 	int				nb_eat;
-	int				timestamp;
-	int				died;
+	int				lastmeal;
+	int				dead;
 }				t_philos;
 
 int		ft_atoi(const char *nptr);
-void	taking_fork(t_philos *philo);
-void	sleeping(t_philos *philo);
+int		taking_fork(t_philos *philo);
 int		eating(t_philos *philo);
-void	thinking(t_philos *philo);
+int		sleeping(t_philos *philo);
+int		thinking(t_philos *philo);
 int		philo_lives(t_philos *philo);
 int		my_gettime(void);
-int		milli_to_micro(int milli);
-int		micro_to_milli(int micro);
-int		timestamp(int start);
+int		time_since_lastmeal(int lastmeal, int current_time);
+int		free_stuffs(t_philos *philos, t_param *p, pthread_t *thread);
 
 #endif
