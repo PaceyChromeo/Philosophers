@@ -6,7 +6,7 @@
 /*   By: pjacob <pjacob@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/18 13:08:00 by pjacob            #+#    #+#             */
-/*   Updated: 2021/08/25 15:54:35 by pjacob           ###   ########.fr       */
+/*   Updated: 2021/09/20 12:41:32 by pjacob           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,19 +35,20 @@ typedef struct s_param
 	int				time_to_eat;
 	int				time_to_sleep;
 	int				max_eat;
-	int				start;
+	long			start_time;
 	pthread_mutex_t	*fork;
+	pthread_mutex_t	write;
 }				t_param;
 
 typedef struct s_philosophers
 {
-	t_param			*philo_p;
-	int				philo_id;
-	int				left_fork;
-	int				right_fork;
-	int				nb_eat;
-	int				lastmeal;
-	int				dead;
+	t_param	*philo_p;
+	int		philo_id;
+	int		left_fork;
+	int		right_fork;
+	int		nb_eat;
+	int		dead;
+	long	lastmeal;
 }				t_philos;
 
 int		ft_atoi(const char *nptr);
@@ -56,8 +57,9 @@ int		eating(t_philos *philo);
 int		sleeping(t_philos *philo);
 int		thinking(t_philos *philo);
 int		philo_lives(t_philos *philo);
-int		my_gettime(void);
-int		time_since_lastmeal(int lastmeal, int current_time);
+long	my_gettime(void);
+void	ft_usleep(int milli);
 int		free_stuffs(t_philos *philos, t_param *p, pthread_t *thread);
+void	*time_control(void *philos);
 
 #endif

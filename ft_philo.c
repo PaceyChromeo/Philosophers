@@ -6,7 +6,7 @@
 /*   By: pjacob <pjacob@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/18 13:15:06 by pjacob            #+#    #+#             */
-/*   Updated: 2021/08/25 15:46:28 by pjacob           ###   ########.fr       */
+/*   Updated: 2021/09/20 12:33:26 by pjacob           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,18 +17,16 @@ static void	*philo_life(void *philos)
 	t_philos	*philo;
 
 	philo = (t_philos *)philos;
-	if (philo->philo_id % 2)
-		usleep(2000);
+	if (philo->philo_id % 2 && philo->philo_p->nb_philo > 1)
+		usleep(philo->philo_p->time_to_eat * 1000);
+	philo->lastmeal = my_gettime() - philo->philo_p->start_time;
 	while (philo_lives(philo))
 	{
-		if (taking_fork(philo) == 0)
-			return (NULL);
+		taking_fork(philo);
 		if (eating(philo) == 0)
 			return (NULL);
-		if (sleeping(philo) == 0)
-			return (NULL);
-		if (thinking(philo) == 0)
-			return (NULL);
+		sleeping(philo);
+		thinking(philo);
 	}
 	return (NULL);
 }
@@ -39,17 +37,18 @@ static void	init_thd(t_philos *philos, t_param *p, int i)
 	philos[i].right_fork = (i + 1) % p->nb_philo;
 	philos[i].left_fork = i;
 	philos[i].nb_eat = p->max_eat;
-	p->start = my_gettime();
-	philos[i].lastmeal = p->start;
-	philos->dead = 0;
+	philos[i].dead = 0;
+	p->start_time = my_gettime();
 	philos[i].philo_p = p;
 }
 
 static int	lch_join_dest(t_philos *philos, t_param *p, pthread_t *thread)
 {
-	int	i;
+	int			i;
+	pthread_t	control;
 
 	i = -1;
+	pthread_mutex_init(&p->write, NULL);
 	while (++i < p->nb_philo)
 		pthread_mutex_init(&p->fork[i], NULL);
 	i = -1;
@@ -57,22 +56,9 @@ static int	lch_join_dest(t_philos *philos, t_param *p, pthread_t *thread)
 		init_thd(philos, p, i);
 	i = -1;
 	while (++i < p->nb_philo)
-		pthread_create(&thread[i], NULL, philo_life, &philos[i]);
-	i = -1;
-	while (++i < p->nb_philo)
-	{
-		pthread_join(thread[i], NULL);
-		if (philos[i].nb_eat == 0)
-			pthread_detach(thread[i]);
-		printf("Philo %d dead : %d\n", philos->philo_id, philos->dead);
-		if (philos[i].dead)
-		{
-			i = -1;
-			while (++i < p->nb_philo)
-				pthread_detach(thread[i]);		
-			return (free_stuffs(philos, p, thread));
-		}
-	}
+		pthread_create(&thread[i], NULL, (void *)philo_life, &philos[i]);
+	pthread_create(&control, NULL, (void *)time_control, philos);
+	pthread_join(control, NULL);
 	return (free_stuffs(philos, p, thread));
 }
 
@@ -101,14 +87,23 @@ int	main(int ac, char **av)
 	if (ac == 5 || ac == 6)
 	{
 		param.nb_philo = ft_atoi(av[1]);
+		if (param.nb_philo < 1)
+			printf(RED"You must have minimum 1 philosophers\n");
 		param.time_to_die = ft_atoi(av[2]);
 		param.time_to_eat = ft_atoi(av[3]);
 		param.time_to_sleep = ft_atoi(av[4]);
+		if (!param.time_to_die || !param.time_to_eat || !param.time_to_sleep)
+		{
+			printf(RED"Enter a valid time in milliseconds\n");
+			return (0);
+		}
 		if (ac == 6)
 			param.max_eat = ft_atoi(av[5]);
 		else
 			param.max_eat = -1;
 		create_thread(&param);
 	}
+	else
+		printf(RED"You must have 5 or 6 parameters\n");
 	return (0);
 }

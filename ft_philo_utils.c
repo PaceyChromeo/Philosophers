@@ -6,7 +6,7 @@
 /*   By: pjacob <pjacob@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/05 10:40:32 by pjacob            #+#    #+#             */
-/*   Updated: 2021/08/25 15:28:50 by pjacob           ###   ########.fr       */
+/*   Updated: 2021/09/20 12:30:38 by pjacob           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,7 @@ int	free_stuffs(t_philos *philos, t_param *p, pthread_t *thread)
 	i = -1;
 	while (++i < p->nb_philo)
 		pthread_mutex_destroy(&p->fork[i]);
+	pthread_mutex_destroy(&p->write);
 	free(p->fork);
 	free(philos);
 	free(thread);

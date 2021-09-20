@@ -6,29 +6,27 @@
 /*   By: pjacob <pjacob@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/23 12:22:35 by pjacob            #+#    #+#             */
-/*   Updated: 2021/08/25 15:54:22 by pjacob           ###   ########.fr       */
+/*   Updated: 2021/09/20 12:41:28 by pjacob           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_philo.h"
 
-int	my_gettime(void)
+long	my_gettime(void)
 {
-	int				my_time;
+	long			my_time;
 	struct timeval	t;
 
 	gettimeofday(&t, NULL);
-	my_time = t.tv_usec / 1000;
+	my_time = (t.tv_sec * 1000) + (t.tv_usec / 1000);
 	return (my_time);
 }
 
-int	time_since_lastmeal(int lastmeal, int current_time)
+void	ft_usleep(int milli)
 {
-	int	diff;
+	long	time;
 
-	if (current_time >= lastmeal)
-		diff = current_time - lastmeal;
-	else
-		diff = (current_time + 1000) - lastmeal;
-	return (diff);
+	time = my_gettime();
+	while ((my_gettime() - time) < milli)
+		usleep(milli);
 }
